@@ -173,7 +173,7 @@ class CommandBus extends AnswerBus
 		$commands = [];
         if ($message->has('entities')) {
             $this->parseCommandsIn($message)
-                ->each(function (array $botCommand) use ($update, $commands) {
+                ->each(function (array $botCommand) use ($update, &$commands) {
                     $commands[] = $this->process($botCommand, $update);
                 });
         }

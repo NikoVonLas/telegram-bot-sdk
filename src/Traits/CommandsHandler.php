@@ -117,9 +117,11 @@ trait CommandsHandler
      *
      * @return mixed
      */
-    public function triggerCommand(string $name, Update $update, $entity = null)
+    public function triggerCommand(string $name, Update $update, ?array $entity = null, bool $callback = false)
     {
-        $entity = $entity ?? ['offset' => 0, 'length' => strlen($name) + 1, 'type' => "bot_command"];
+		if (!$callback) {
+			$entity = $entity ?? ['offset' => 0, 'length' => strlen($name) + 1, 'type' => "bot_command"];
+		}
 
         return $this->getCommandBus()->execute(
             $name,

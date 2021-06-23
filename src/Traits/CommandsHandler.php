@@ -37,7 +37,7 @@ trait CommandsHandler
      *
      * @return Update|Update[]
      */
-    public function commandsHandler(bool $webhook = false)
+    public function commandsHandler(bool $webhook = false): array
     {
         return $webhook ? $this->useWebHook() : $this->useGetUpdates();
     }
@@ -45,29 +45,31 @@ trait CommandsHandler
     /**
      * Process the update object for a command from your webhook.
      *
-     * @return Update
+     * @return array
      */
-    protected function useWebHook(): Update
+    protected function useWebHook(): array
     {
         $update = $this->getWebhookUpdate();
-        $this->processCommand($update);
-
-        return $update;
+        return $this->processCommand($update);
     }
 
     /**
      * Process the update object for a command using the getUpdates method.
      *
-     * @return Update[]
+     * @return array
      */
     protected function useGetUpdates(): array
     {
         $updates = $this->getUpdates();
         $highestId = -1;
 
+		$updatesArr = [];
         foreach ($updates as $update) {
             $highestId = $update->updateId;
-            $this->processCommand($update);
+            $updatesArr[] = [
+				'update_id'	=> $highestId,
+				'commands' 	=> $this->processCommand($update)
+			];
         }
 
         //An update is considered confirmed as soon as getUpdates is called with an offset higher than it's update_id.
@@ -75,7 +77,7 @@ trait CommandsHandler
             $this->markUpdateAsRead($highestId);
         }
 
-        return $updates;
+        return $updatesArr;
     }
 
     /**
@@ -98,10 +100,12 @@ trait CommandsHandler
      * Check update object for a command and process.
      *
      * @param Update $update
+	 *
+	 * @return string[]
      */
-    public function processCommand(Update $update)
+    public function processCommand(Update $update): array
     {
-        $this->getCommandBus()->handler($update);
+        return $this->getCommandBus()->handler($update);
     }
 
     /**

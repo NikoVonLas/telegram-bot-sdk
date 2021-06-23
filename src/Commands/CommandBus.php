@@ -165,20 +165,27 @@ class CommandBus extends AnswerBus
      *
      * @param $update
      *
-     * @return Update
+     * @return array
      */
-    protected function handler(Update $update): Update
+    protected function handler(Update $update): array
     {
         $message = $update->getMessage();
-
+		$commands = [];
         if ($message->has('entities')) {
             $this->parseCommandsIn($message)
-                ->each(function (array $botCommand) use ($update) {
-                    $this->process($botCommand, $update);
+                ->each(function (array $botCommand) use ($update, $commands) {
+                    $commands[] = $this->process($botCommand, $update);
                 });
         }
 
-        return $update;
+		if ($message->has('callback_query')) {
+			$commands[] = $message->get('callback_query')['data'];
+			$this->execute($message->get('callback_query')['data'], $update, [
+				'callback_query_id' => $message->get('callback_query')['id']
+			]);
+		}
+
+        return $commands;
     }
 
     /**
@@ -201,8 +208,10 @@ class CommandBus extends AnswerBus
      *
      * @param array  $entity
      * @param Update $update
+	 *
+	 * @return string
      */
-    protected function process($entity, Update $update)
+    protected function process($entity, Update $update): string
     {
         $command = $this->parseCommand(
             $update->getMessage()->text,
@@ -211,6 +220,8 @@ class CommandBus extends AnswerBus
         );
 
         $this->execute($command, $update, $entity);
+
+		return $command;
     }
 
     /**

@@ -178,6 +178,12 @@ class CommandBus extends AnswerBus
                 });
         }
 
+		if ($message->has('callback_query')) {
+			$this->execute($message->get('callback_query')['data'], $update, [
+				'callback_query_id' => $message->get('callback_query')['id']
+			]);
+		}
+
         return $update;
     }
 

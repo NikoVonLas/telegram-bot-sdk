@@ -165,7 +165,7 @@ class CommandBus extends AnswerBus
      *
      * @param $update
      *
-     * @return array
+     * @return string[]
      */
     protected function handler(Update $update): array
     {

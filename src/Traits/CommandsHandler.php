@@ -35,7 +35,7 @@ trait CommandsHandler
      *
      * @param bool $webhook
      *
-     * @return Update|Update[]
+     * @return array[]|string[]
      */
     public function commandsHandler(bool $webhook = false): array
     {
@@ -45,7 +45,7 @@ trait CommandsHandler
     /**
      * Process the update object for a command from your webhook.
      *
-     * @return array
+     * @return string[]
      */
     protected function useWebHook(): array
     {

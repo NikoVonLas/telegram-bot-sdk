@@ -171,18 +171,18 @@ abstract class Command implements CommandInterface
      *
      * @param Api $telegram
      * @param Update $update
-     * @param array $entity
+     * @param null|array $entity
      *
      * @return mixed
      */
-    public function make(Api $telegram, Update $update, array $entity)
+    public function make(Api $telegram, Update $update, ?array $entity)
     {
         $this->telegram = $telegram;
         $this->update = $update;
         $this->entity = $entity;
         $this->arguments = $this->parseCommandArguments();
 
-        return call_user_func_array([$this, 'handle'], array_values($this->getArguments()));
+        return call_user_func([$this, 'handle'], $this->getArguments());
     }
 
     /**
@@ -193,13 +193,14 @@ abstract class Command implements CommandInterface
     /**
      * Helper to Trigger other Commands.
      *
-     * @param string $command
+     * @param string 	$command
+	 * @param bool 		$callbackQuery
      *
      * @return mixed
      */
-    protected function triggerCommand(string $command)
+    protected function triggerCommand(string $command, bool $callbackQuery = false)
     {
-        return $this->getCommandBus()->execute($command, $this->update, $this->entity);
+		return $this->telegram->triggerCommand($command, $this->update, $this->entity, $callbackQuery);
     }
 
     /**
@@ -271,7 +272,7 @@ abstract class Command implements CommandInterface
             })
             ->implode('');
 
-        return "%/{$this->getName()}{$optionalBotName}{$required}{$optional}{$customRegex}%si";
+        return "%{$this->getName()}{$optionalBotName}{$required}{$optional}{$customRegex}%si";
     }
 
     private function formatMatches(array $matches, Collection $required, Collection $optional)
@@ -304,7 +305,11 @@ abstract class Command implements CommandInterface
         $commandOffsets = $this->allCommandOffsets();
 
         if ($commandOffsets->isEmpty()) {
-            return $this->getUpdate()->getMessage()->text;
+            if ($this->getUpdate()->isType('callback_query')) {
+                return $this->getUpdate()->callbackQuery->get('data');
+            } else {
+                return $this->getUpdate()->getMessage()->text;
+            }
         }
 
         //Extract the current offset for this command and, if it exists, the offset of the NEXT bot_command entity

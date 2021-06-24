@@ -63,13 +63,13 @@ trait CommandsHandler
         $updates = $this->getUpdates();
         $highestId = -1;
 
-		$updatesArr = [];
+        $updatesArr = [];
         foreach ($updates as $update) {
             $highestId = $update->updateId;
             $updatesArr[] = [
-				'update_id'	=> $highestId,
-				'commands' 	=> $this->processCommand($update)
-			];
+                'update_id'	=> $highestId,
+                'commands' 	=> $this->processCommand($update)
+            ];
         }
 
         //An update is considered confirmed as soon as getUpdates is called with an offset higher than it's update_id.
@@ -100,8 +100,8 @@ trait CommandsHandler
      * Check update object for a command and process.
      *
      * @param Update $update
-	 *
-	 * @return string[]
+     *
+     * @return string[]
      */
     public function processCommand(Update $update): array
     {
@@ -119,9 +119,19 @@ trait CommandsHandler
      */
     public function triggerCommand(string $name, Update $update, ?array $entity = null, bool $callback = false)
     {
-		if (!$callback) {
-			$entity = $entity ?? ['offset' => 0, 'length' => strlen($name) + 1, 'type' => "bot_command"];
-		}
+        if (!$callback) {
+            $entity = $entity ?? ['offset' => 0, 'length' => strlen($name) + 1, 'type' => "bot_command"];
+        } else {
+            $update->merge([
+                'callback_query' => [
+                    'data'      => $name
+                ]
+            ]);
+            if (mb_strpos($name, '  ') !== false) {
+                $name = explode('  ', $name);
+                $name = array_shift($name);
+            }
+        }
 
         return $this->getCommandBus()->execute(
             $name,

@@ -96,6 +96,19 @@ abstract class BaseObject extends Collection
         return $value;
     }
 
+	/**
+     * Set an item from the collection by key.
+     *
+     * @param mixed $key
+     * @param mixed $value
+     *
+     * @return void
+     */
+    public function set($key, $value)
+    {
+        parent::put($key, $value);
+    }
+
     /**
      * Returns raw response.
      *

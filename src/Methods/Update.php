@@ -157,7 +157,11 @@ trait Update
      */
     public function getWebhookUpdate($shouldEmitEvent = true): UpdateObject
     {
-        $body = json_decode(file_get_contents('php://input'), true);
+        if (function_exists('request')) {
+            $body = request()->json();
+        } else {
+            $body = json_decode(file_get_contents('php://input'), true);
+        }
 
         $update = new UpdateObject($body);
 

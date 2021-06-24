@@ -171,7 +171,7 @@ class CommandBus extends AnswerBus
     {
         $message = $update->getMessage();
 
-		$commands = [];
+        $commands = [];
         if ($message->has('entities')) {
             $this->parseCommandsIn($message)
                 ->each(function (array $botCommand) use ($update, &$commands) {
@@ -179,18 +179,18 @@ class CommandBus extends AnswerBus
                 });
         }
 
-		if ($update->isType('callback_query')) {
-		    $command = $update->callbackQuery->get('data');
-			$commands[] = $command;
-			if (mb_strpos($command, '  ') !== false) {
-			    $command = explode('  ', $command);
+        if ($update->isType('callback_query')) {
+            $command = $update->callbackQuery->get('data');
+            $commands[] = $command;
+            if (mb_strpos($command, '  ') !== false) {
+                $command = explode('  ', $command);
                 $command = array_shift($command);
             }
 
-			$this->execute($command, $update, [
-				'callback_query_id' => $update->callbackQuery->get('id')
-			]);
-		}
+            $this->execute($command, $update, [
+                'callback_query_id' => $update->callbackQuery->get('id')
+            ]);
+        }
 
         return $commands;
     }
@@ -215,8 +215,8 @@ class CommandBus extends AnswerBus
      *
      * @param array  $entity
      * @param Update $update
-	 *
-	 * @return string
+     *
+     * @return string
      */
     protected function process($entity, Update $update): string
     {
@@ -228,7 +228,7 @@ class CommandBus extends AnswerBus
 
         $this->execute($command, $update, $entity);
 
-		return $command;
+        return $command;
     }
 
     /**

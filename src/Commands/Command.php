@@ -194,13 +194,13 @@ abstract class Command implements CommandInterface
      * Helper to Trigger other Commands.
      *
      * @param string 	$command
-	 * @param bool 		$callbackQuery
+     * @param bool 		$callbackQuery
      *
      * @return mixed
      */
     protected function triggerCommand(string $command, bool $callbackQuery = false)
     {
-		return $this->telegram->triggerCommand($command, $this->update, $this->entity, $callbackQuery);
+        return $this->telegram->triggerCommand($command, $this->update, $this->entity, $callbackQuery);
     }
 
     /**

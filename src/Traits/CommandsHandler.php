@@ -122,11 +122,13 @@ trait CommandsHandler
         if (!$callback) {
             $entity = $entity ?? ['offset' => 0, 'length' => strlen($name) + 1, 'type' => "bot_command"];
         } else {
-            $update->merge([
+            $mergedUpdate = $update->mergeRecursive([
                 'callback_query' => [
-                    'data'      => $name
+                    'data'      => $name,
+                    'message'   => $update->getMessage()
                 ]
             ]);
+
             if (mb_strpos($name, '  ') !== false) {
                 $name = explode('  ', $name);
                 $name = array_shift($name);
@@ -135,7 +137,7 @@ trait CommandsHandler
 
         return $this->getCommandBus()->execute(
             $name,
-            $update,
+            $mergedUpdate,
             $entity
         );
     }

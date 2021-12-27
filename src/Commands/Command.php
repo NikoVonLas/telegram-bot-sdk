@@ -266,11 +266,11 @@ abstract class Command implements CommandInterface
             })
             ->implode('\s+?');
 
-        $optional = $optional
-            ->map(function ($varName) {
-                return "(?:\s+?(?P<$varName>[^ ]++))?";
-            })
-            ->implode('');
+		$optional = $optional
+	        ->map(function ($varName) {
+	            return "(?:(?P<$varName>[^ ]++))?";
+	        })
+	        ->implode('');
 
         return "%{$this->getName()}{$optionalBotName}{$required}{$optional}{$customRegex}%si";
     }
